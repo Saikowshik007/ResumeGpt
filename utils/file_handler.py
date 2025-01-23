@@ -1,7 +1,7 @@
 import os
 from typing import Union, List, Generator, Optional
-from .. import config
-from .. import utils
+import config
+import utils
 
 
 def read_jobfile(filename: str) -> str:

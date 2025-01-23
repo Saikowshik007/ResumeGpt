@@ -7,7 +7,7 @@ from langchain_openai import ChatOpenAI
 logger = logging.getLogger(__name__)
 
 # Your resume filename here:
-YOUR_RESUME_NAME = "sample_resume.yaml"
+YOUR_RESUME_NAME = "resume.yaml"
 
 # Define project paths
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,8 +28,8 @@ REQUESTS_HEADERS = {
 CHAT_MODEL = ChatOpenAI
 MODEL_NAME = "gpt-4o"
 TEMPERATURE = 0.3
-OPEN_FILE_COMMAND = "cursor -r"
-#OPEN_FILE_COMMAND = "code -r"
+# OPEN_FILE_COMMAND = "cursor -r"
+OPEN_FILE_COMMAND = "notepad "
 MAX_CONCURRENT_WORKERS = 4
 MAX_RETRIES = 3
 BACKOFF_FACTOR = 5

@@ -5,8 +5,8 @@ from dateutil.relativedelta import relativedelta
 from langchain_openai import ChatOpenAI
 import langchain
 from langchain_community.cache import InMemoryCache
-from .. import config
-from .. import utils
+import config
+import utils
 
 # Set up LLM cache
 langchain.llm_cache = InMemoryCache()

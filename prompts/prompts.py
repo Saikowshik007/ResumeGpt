@@ -1,7 +1,7 @@
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain.schema import HumanMessage, SystemMessage
 import yaml
-from .. import config
+import config
 
 
 class Prompts:

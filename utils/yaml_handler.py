@@ -2,7 +2,7 @@ import yaml
 from ruamel.yaml.error import YAMLError
 from io import StringIO
 from typing import Optional
-from .. import config
+import config
 
 
 def read_yaml(yaml_text: str = "", filename: str = "") -> Optional[dict]:

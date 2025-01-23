@@ -9,23 +9,23 @@ import requests
 from langchain.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableSequence
 from langchain_core.output_parsers import StrOutputParser
-from ..models.resume import (
+from models.resume import (
     ResumeImproverOutput,
     ResumeSkillsMatcherOutput,
     ResumeSummarizerOutput,
     ResumeSectionHighlighterOutput,
 )
-from .. import utils
-from .. import config
-from .langchain_helpers import *
-from ..prompts import Prompts
-from ..models.job_post import JobPost
-from ..pdf_generation import ResumePDFGenerator
+import utils
+import config
+from services.langchain_helpers import *
+from prompts import Prompts
+from models.job_post import JobPost
+from pdf_generation import ResumePDFGenerator
 import concurrent.futures
 from fp.fp import FreeProxy
 import time
-from ..config import config
-from .background_runner import BackgroundRunner
+from config import config
+from services.background_runner import BackgroundRunner
 
 
 class ResumeImprover:
@@ -209,7 +209,7 @@ class ResumeImprover:
         config.logger.info("Extracting matched skills...")
         self.skills = self.extract_matched_skills(verbose=False)
         config.logger.info("Writing objective...")
-        self.objective = self.write_objective(verbose=False)
+        # self.objective = self.write_objective(verbose=False)
         config.logger.info("Updating bullet points...")
         self.experiences = self.rewrite_unedited_experiences(verbose=False)
         config.logger.info("Updating projects...")
@@ -227,8 +227,8 @@ class ResumeImprover:
         )
         utils.write_yaml(resume_dict, filename=self.yaml_loc)
         self.resume_yaml = utils.read_yaml(filename=self.yaml_loc)
-        if auto_open:
-            subprocess.run(config.OPEN_FILE_COMMAND.split(" ") + [self.yaml_loc])
+        # if auto_open:
+        #     subprocess.run(config.OPEN_FILE_COMMAND.split(" ") + [self.yaml_loc])
         while manual_review and utils.read_yaml(filename=self.yaml_loc)["editing"]:
             time.sleep(5)
         config.logger.info("Saving PDF")
@@ -253,7 +253,7 @@ class ResumeImprover:
         logger.info("Extracting matched skills...")
         self.skills = self.extract_matched_skills(verbose=False)
         logger.info("Writing objective...")
-        self.objective = self.write_objective(verbose=False)
+        # self.objective = self.write_objective(verbose=False)
         logger.info("Updating bullet points...")
         self.experiences = self.rewrite_unedited_experiences(verbose=False)
         logger.info("Updating projects...")
@@ -470,24 +470,24 @@ class ResumeImprover:
         self._combine_skill_lists(result, self.skills)
         return result
 
-    def write_objective(self, **chain_kwargs) -> dict:
-        """Write a objective for the resume.
-
-        Args:
-            **chain_kwargs: Additional keyword arguments for the chain.
-
-        Returns:
-            dict: The written objective.
-        """
-        chain = self._chain_updater(
-            Prompts.lookup["OBJECTIVE_WRITER"], ResumeSummarizerOutput, **chain_kwargs
-        )
-
-        chain_inputs = self._get_formatted_chain_inputs(chain=chain)
-        objective = chain.invoke(chain_inputs).dict()
-        if not objective or "final_answer" not in objective:
-            return None
-        return objective["final_answer"]
+    # def write_objective(self, **chain_kwargs) -> dict:
+    #     """Write a objective for the resume.
+    #
+    #     Args:
+    #         **chain_kwargs: Additional keyword arguments for the chain.
+    #
+    #     Returns:
+    #         dict: The written objective.
+    #     """
+    #     chain = self._chain_updater(
+    #         Prompts.lookup["OBJECTIVE_WRITER"], ResumeSummarizerOutput, **chain_kwargs
+    #     )
+    #
+    #     chain_inputs = self._get_formatted_chain_inputs(chain=chain)
+    #     objective = chain.invoke(chain_inputs).dict()
+    #     if not objective or "final_answer" not in objective:
+    #         return None
+    #     return objective["final_answer"]
 
     def suggest_improvements(self, **chain_kwargs) -> dict:
         """Suggest improvements for the resume.

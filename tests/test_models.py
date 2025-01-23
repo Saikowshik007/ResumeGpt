@@ -1,6 +1,6 @@
 import unittest
-from ..models.job_post import JobDescription, JobPost
-from ..models.resume import ResumeSectionHighlight, ResumeSectionHighlighterOutput, ResumeSkills, ResumeSkillsMatcherOutput, ResumeSummarizerOutput, ResumeImprovements, ResumeImproverOutput
+from models.job_post import JobDescription
+from models.resume import ResumeSectionHighlight, ResumeSectionHighlighterOutput, ResumeSkills, ResumeSkillsMatcherOutput, ResumeSummarizerOutput, ResumeImprovements, ResumeImproverOutput
 
 class TestJobDescription(unittest.TestCase):
     def test_job_description_fields(self):

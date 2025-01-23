@@ -1,5 +1,5 @@
 import yaml
-from .. import config
+import config
 
 def check_resume_format(yaml_file_path: str) -> bool:
     """Check if the resume format is correct and provide suggestions for corrections.

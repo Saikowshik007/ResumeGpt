@@ -2,8 +2,8 @@ import configparser
 import json
 import os
 import random
-from .. import config
-from .. import utils
+import config
+import utils
 import subprocess
 import yaml
 
@@ -305,15 +305,6 @@ class ResumePDFGenerator:
 
 
     def add_education(self, table_data, table_styles, row_index, education):
-        """
-        Add education section to the resume.
-
-        Args:
-            table_data (list): The table data to be extended.
-            table_styles (list): The table styles to be extended.
-            row_index (int): The current row index in the table.
-            education (list): The list of education entries to be added.
-        """
         row_index = self._add_table_row(
             table_data=table_data,
             table_styles=table_styles,
@@ -327,17 +318,23 @@ class ResumePDFGenerator:
 
         for edu in education:
             degrees = ", ".join(edu["degrees"][0]["names"])
+            gpa = f", GPA: {edu['degrees'][0]['gpa']}" if edu['degrees'][0].get('gpa') else ""
+            dates = edu['degrees'][0].get('dates', '')
+
             row_index = self._add_table_row(
                 table_data=table_data,
                 table_styles=table_styles,
                 row_index=row_index,
                 content_style_map=[
                     (
-                        f"<font name='{resume_pdf_styles.FONT_NAMES['bold']}'>{edu['school']}</font>, {degrees}",
+                        f"<font name='{resume_pdf_styles.FONT_NAMES['bold']}'>{edu['school']}</font>, {degrees}{gpa}",
                         resume_pdf_styles.PARAGRAPH_STYLES["education"],
+                    ),
+                    (
+                        dates,
+                        resume_pdf_styles.PARAGRAPH_STYLES["company_duration"]
                     )
                 ],
-                span=True,
             )
         return row_index
 
@@ -436,27 +433,27 @@ class ResumePDFGenerator:
             span=True,
         )
 
-        # Add objective
-        row_index = self._add_table_row(
-            table_data=table_data,
-            table_styles=table_styles,
-            row_index=row_index,
-            content_style_map=[
-                ("Objective", resume_pdf_styles.PARAGRAPH_STYLES["section"])
-            ],
-            span=True,
-        )
-        self._append_section_table_style(table_styles, row_index - 1)
-
-        row_index = self._add_table_row(
-            table_data=table_data,
-            table_styles=table_styles,
-            row_index=row_index,
-            content_style_map=[
-                (data["objective"], resume_pdf_styles.PARAGRAPH_STYLES["objective"])
-            ],
-            span=True,
-        )
+        # # Add objective
+        # row_index = self._add_table_row(
+        #     table_data=table_data,
+        #     table_styles=table_styles,
+        #     row_index=row_index,
+        #     content_style_map=[
+        #         ("Objective", resume_pdf_styles.PARAGRAPH_STYLES["section"])
+        #     ],
+        #     span=True,
+        # )
+        # self._append_section_table_style(table_styles, row_index - 1)
+        #
+        # row_index = self._add_table_row(
+        #     table_data=table_data,
+        #     table_styles=table_styles,
+        #     row_index=row_index,
+        #     content_style_map=[
+        #         (data["objective"], resume_pdf_styles.PARAGRAPH_STYLES["objective"])
+        #     ],
+        #     span=True,
+        # )
 
         # Add experience
         row_index = self.add_experiences(

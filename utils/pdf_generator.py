@@ -4,7 +4,7 @@ from jinja2 import Environment, FileSystemLoader
 from ruamel.yaml import YAML
 from ruamel.yaml.compat import StringIO
 from ruamel.yaml.error import YAMLError
-from .. import config
+import config
 from . import yaml_handler
 
 
