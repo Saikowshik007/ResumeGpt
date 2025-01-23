@@ -1,3 +1,5 @@
+import os
+
 import streamlit as st
 import logging
 import services
@@ -71,27 +73,38 @@ def main():
                 yaml_dict = yaml.safe_load(edited_yaml)
                 yaml_dict["editing"] = False
 
+                # Save YAML first
                 with open(st.session_state.resume_improver.yaml_loc, 'w') as f:
                     yaml.dump(yaml_dict, f)
-                st.session_state.resume_improver.create_pdf(auto_open=False)
-                st.success("PDF generated successfully!")
-                st.session_state.stage = 'input'
+
+                # Generate PDF and get the correct path
+                pdf_path = st.session_state.resume_improver.create_pdf(auto_open=False)
+                if pdf_path and os.path.exists(pdf_path):
+                    st.session_state.pdf_path = pdf_path  # Store path in session state
+                    st.success("PDF generated successfully!")
+                else:
+                    st.error("PDF generation failed - no file created")
+                    return
+
             except Exception as e:
                 st.error(f"Error saving changes: {str(e)}")
+                return
 
-        if st.button("Open PDF", key="open_pdf"):
-            pdf_path = os.path.join(st.session_state.resume_improver.yaml_loc, "Sai_Ananthula_resume.pdf")
-            if os.path.exists(pdf_path):
-                with open(pdf_path, "rb") as f:
+        # Only show Open PDF button if we have a valid PDF path stored
+        if hasattr(st.session_state, 'pdf_path') and os.path.exists(st.session_state.pdf_path):
+            try:
+                with open(st.session_state.pdf_path, "rb") as f:
                     pdf_bytes = f.read()
                 st.download_button(
                     label="Download PDF",
                     data=pdf_bytes,
-                    file_name="SAI_ANANTHULA_resume.pdf",
+                    file_name="Sai_Ananthula_resume.pdf",
                     mime="application/pdf"
                 )
-            else:
-                st.error("PDF not found. Please generate it first.")
+            except Exception as e:
+                st.error(f"Error reading PDF file: {str(e)}")
+        else:
+            st.info("Generate a PDF first before downloading")
 
         if st.button("Cancel", key="cancel_btn"):
             st.session_state.stage = 'input'
