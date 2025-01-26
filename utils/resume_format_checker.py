@@ -42,7 +42,6 @@ def check_resume_format(yaml_file_path: str) -> bool:
                 "name": str,
                 "hyperlink": bool,
                 "show_link": bool,
-                "date": str,
                 "link": str,
                 "highlights": [str],
             }

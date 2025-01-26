@@ -257,8 +257,7 @@ class ResumePDFGenerator:
                         (
                             paragraph_text,
                             combined_style
-                        ),
-                        (project["date"], resume_pdf_styles.PARAGRAPH_STYLES["company_duration"]),
+                        )
                     ],
                 )
             else:
@@ -270,11 +269,9 @@ class ResumePDFGenerator:
                         (
                             project_name,
                             resume_pdf_styles.PARAGRAPH_STYLES["company_heading"]
-                        ),
-                        (project["date"], resume_pdf_styles.PARAGRAPH_STYLES["company_duration"]),
+                        )
                     ],
                 )
-
 
             for i, bullet_point in enumerate(project["highlights"]):
                 bullet_point = bullet_point.replace("'", "").replace('"', "").strip()

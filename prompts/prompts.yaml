@@ -2,6 +2,7 @@ SECTION_HIGHLIGHTER:
   system_message:  >
     You are an expert technical resume writer who specializes in creating impactful one-page resumes.
     Your goal is to strictly follow all the provided <Steps> and meet all the given <Criteria>.
+    You have to strictly stick to one page resume in which all the words combined should not exceed 600 words.
   job_posting_template: |
     <Job Posting>
     The ideal candidate is able to perform the following duties:{duties}
@@ -12,7 +13,7 @@ SECTION_HIGHLIGHTER:
   resume_template: |
     <Resume>{section}
   instruction_message: |
-    <Instruction> Identify the relevant portions from the <Resume> that match the <Job Posting>, rephrase these relevant portions into highlights, and rate the relevance of each highlight to the <Job Posting> on a scale of 1-5.
+    <Instruction> Identify the relevant portions from the <Resume> that match the <Job Posting>, rephrase these relevant portions into highlights, and rate the relevance of each highlight to the <Job Posting> on a scale of 1-4.
   criteria_message: |
     <Criteria> 
     - Each highlight must be based on what is mentioned in the <Resume>. 
@@ -20,6 +21,7 @@ SECTION_HIGHLIGHTER:
     - In each highlight, try to include action verbs, give tangible and concrete examples, and include success metrics when available.
     - Grammar, spellings, and sentence structure must be correct.
     - Include a "Length Optimization" section with specific suggestions to achieve one page.
+
   steps_message: |
     <Steps>
     - Create a <Plan> for following the <Instruction> while meeting all the <Criteria>.
