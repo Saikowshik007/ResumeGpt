@@ -90,50 +90,22 @@ def generate_final_pdf(yaml_content, resume_improver, output_dir):
 
 def display_pdf(pdf_path):
     try:
-        # Create a custom HTML component that uses PDF.js with a local file
-        pdf_display = f"""
-            <div style="width:100%; height:800px;">
-                <object
-                    data="pdf"
-                    type="application/pdf"
-                    width="100%"
-                    height="100%"
-                >
-                    <p>It appears your browser doesn't support embedded PDFs.</p>
-                </object>
-            </div>
-        """
+        with open(pdf_path, "rb") as pdf_file:
+            base64_pdf = base64.b64encode(pdf_file.read()).decode('utf-8')
+            pdf_display = f'<embed src="data:application/pdf;base64,{base64_pdf}" width="100%" height="800" type="application/pdf">'
+            st.markdown(pdf_display, unsafe_allow_html=True)
 
-        # Create a route for serving the PDF
-        from streamlit.components.v1 import html
-        import mimetypes
-        mimetypes.add_type('application/pdf', '.pdf')
-
-        # Read the PDF in chunks to handle large files
-        def get_binary_file_downloader_html():
-            with open(pdf_path, 'rb') as f:
-                bytes = f.read()
-                b64 = base64.b64encode(bytes).decode()
-                # Use a data URL for smaller PDFs
-                return f'<iframe src="data:application/pdf;base64,{b64}" width="100%" height="800px" type="application/pdf"></iframe>'
-
-        # Display the PDF
-        st.markdown(get_binary_file_downloader_html(), unsafe_allow_html=True)
-
-        # Add download button
+        # Add download button for convenience
         with open(pdf_path, "rb") as pdf_file:
             PDFbyte = pdf_file.read()
-
-        st.download_button(
-            label="📥 Download PDF",
-            data=PDFbyte,
-            file_name="resume.pdf",
-            mime='application/pdf',
-        )
-
+            st.download_button(
+                label="📥 Download PDF",
+                data=PDFbyte,
+                file_name="resume.pdf",
+                mime='application/pdf'
+            )
     except Exception as e:
         st.error(f"PDF display error: {str(e)}")
-        st.error("Please try downloading the PDF to view it.")
 
 class StreamlitHandler(logging.Handler):
     def __init__(self, placeholder):
