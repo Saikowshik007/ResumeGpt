@@ -11,9 +11,9 @@ YOUR_RESUME_NAME = "resume.yaml"
 
 # Define project paths
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RESUME_PATH = os.path.join(PROJECT_PATH, "resume")
 DATA_PATH = os.path.join(PROJECT_PATH, "data")
-TESTS_DATA_PATH = os.path.join(PROJECT_PATH, "tests/test_data/")
-DEFAULT_RESUME_PATH = os.path.join(DATA_PATH, YOUR_RESUME_NAME)
+DEFAULT_RESUME_PATH = os.path.join(RESUME_PATH, YOUR_RESUME_NAME)
 BACKGROUND_TASKS_LOG = os.path.join(DATA_PATH, "background_tasks", "tasks.log")
 RESOURCES_PATH = os.path.join(PROJECT_PATH, "resources")
 PROMPTS_PATH = os.path.join(PROJECT_PATH, "prompts")

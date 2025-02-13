@@ -2,10 +2,49 @@ import os
 import base64
 import streamlit as st
 import logging
+
+import config
 import services
 import yaml
 import tempfile
+import shutil
 from pathlib import Path
+
+def get_directory_structure(path):
+    """Return a list of all subfolders in the given path"""
+    path = Path(path)
+    folders = []
+    if path.exists():
+        for item in path.rglob("*"):
+            if item.is_dir():
+                folders.append(str(item))
+    return sorted(folders)
+
+def clear_specific_folder(folder_path):
+    """Clear all files in a specific folder"""
+    try:
+        folder = Path(folder_path)
+        if folder.exists():
+            for item in folder.iterdir():
+                if item.is_file():
+                    item.unlink()
+                elif item.is_dir():
+                    shutil.rmtree(item)
+            return True
+    except Exception as e:
+        st.error(f"Error clearing folder {folder_path}: {str(e)}")
+        return False
+
+def clear_data_folder():
+    try:
+        data_dir = Path("data")
+        if data_dir.exists():
+            shutil.rmtree(data_dir)
+            data_dir.mkdir(exist_ok=True)
+            return True
+    except Exception as e:
+        st.error(f"Error clearing data folder: {str(e)}")
+        return False
 
 def generate_preview_pdf(yaml_content, resume_improver):
     try:
@@ -80,6 +119,42 @@ def main():
         st.session_state.resume_improver = None
         st.session_state.yaml_content = None
         st.session_state.last_yaml = None
+
+    # Add folder management in the sidebar
+    with st.sidebar:
+        st.subheader("Folder Management")
+
+        # Create data directory if it doesn't exist
+        data_dir = Path(config.DATA_PATH)
+        data_dir.mkdir(exist_ok=True)
+
+        # Get all subfolders
+        folders = get_directory_structure(config.DATA_PATH)
+
+        # Show main data folder with clear button
+        col1, col2 = st.columns([4, 1])
+        with col1:
+            st.write("📁 data")
+        with col2:
+            if st.button("❌", key="main_clear"):
+                if clear_data_folder():
+                    st.success("Data folder cleared!")
+                    st.rerun()
+
+        # Show subfolders with individual clear buttons
+        for folder in folders:
+            folder_path = Path(folder)
+            relative_path = folder_path.relative_to(data_dir)
+            indent = "    " * (len(folder_path.parts) - 1)
+
+            col1, col2 = st.columns([4, 1])
+            with col1:
+                st.write(f"{indent}📁 {relative_path}")
+            with col2:
+                if st.button("❌", key=f"clear_{folder}"):
+                    if clear_specific_folder(folder):
+                        st.success(f"Cleared {relative_path}")
+                        st.rerun()
 
     if st.session_state.stage == 'input':
         url = st.text_input("Enter Job URL:", placeholder="https://example.com/job/...")
