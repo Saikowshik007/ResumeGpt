@@ -15,4 +15,5 @@ Jinja2>=3.1.4
 PyYAML>=5.3.1
 pytest-cov>=5.0.0
 PyMuPDF==1.22.5
+PyPDF2
 streamlit

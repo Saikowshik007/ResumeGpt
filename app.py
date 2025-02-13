@@ -91,7 +91,7 @@ def generate_final_pdf(yaml_content, resume_improver, output_dir):
         return None
 
 def display_pdf(pdf_path):
-    """Display PDF using PDF.js"""
+    """Display PDF using PDF.js with page count"""
     try:
         custom_html = """
             <!DOCTYPE html>
@@ -108,45 +108,64 @@ def display_pdf(pdf_path):
                         border: 1px solid #ddd;
                         border-radius: 4px;
                     }
-                    #pdf-canvas {
+                    .page-canvas {
                         width: 100%;
                         height: auto;
                         display: block;
+                        margin-bottom: 20px;
+                    }
+                    #page-count {
+                        text-align: center;
+                        margin: 10px 0;
+                        font-size: 14px;
+                        color: #666;
                     }
                 </style>
             </head>
             <body>
-                <div id="pdf-container">
-                    <canvas id="pdf-canvas"></canvas>
-                </div>
+                <div id="page-count"></div>
+                <div id="pdf-container"></div>
                 <script>
                     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
                     
                     const pdfData = atob('PDFDATA');
                     
                     async function renderPDF() {
+                        const container = document.getElementById('pdf-container');
+                        container.innerHTML = ''; // Clear existing content
+                        
                         const pdf = await pdfjsLib.getDocument({data: pdfData}).promise;
-                        const page = await pdf.getPage(1);
-                        const canvas = document.getElementById('pdf-canvas');
-                        const context = canvas.getContext('2d');
+                        const pageCount = pdf.numPages;
+                        
+                        // Display page count
+                        document.getElementById('page-count').textContent = `Total Pages: ${pageCount}`;
                         
                         // Get container width
-                        const container = document.getElementById('pdf-container');
                         const desiredWidth = container.clientWidth - 20;
                         
-                        // Calculate scale to fit width
-                        const viewport = page.getViewport({scale: 1.0});
-                        const scale = desiredWidth / viewport.width;
-                        const scaledViewport = page.getViewport({scale: scale});
-                        
-                        // Set canvas dimensions
-                        canvas.width = scaledViewport.width;
-                        canvas.height = scaledViewport.height;
-                        
-                        await page.render({
-                            canvasContext: context,
-                            viewport: scaledViewport
-                        }).promise;
+                        // Render each page
+                        for (let pageNum = 1; pageNum <= pageCount; pageNum++) {
+                            const page = await pdf.getPage(pageNum);
+                            const canvas = document.createElement('canvas');
+                            canvas.className = 'page-canvas';
+                            container.appendChild(canvas);
+                            
+                            const context = canvas.getContext('2d');
+                            
+                            // Calculate scale to fit width
+                            const viewport = page.getViewport({scale: 1.0});
+                            const scale = desiredWidth / viewport.width;
+                            const scaledViewport = page.getViewport({scale: scale});
+                            
+                            // Set canvas dimensions
+                            canvas.width = scaledViewport.width;
+                            canvas.height = scaledViewport.height;
+                            
+                            await page.render({
+                                canvasContext: context,
+                                viewport: scaledViewport
+                            }).promise;
+                        }
                     }
                     
                     renderPDF();
@@ -162,10 +181,16 @@ def display_pdf(pdf_path):
         custom_html = custom_html.replace('PDFDATA', base64_pdf)
         st.components.v1.html(custom_html, height=1250)
 
+        # Add page count to Streamlit UI as well
+        import PyPDF2
         with open(pdf_path, "rb") as pdf_file:
+            pdf_reader = PyPDF2.PdfReader(pdf_file)
+            page_count = len(pdf_reader.pages)
+            st.info(f"📄 PDF contains {page_count} page{'s' if page_count != 1 else ''}")
+
             PDFbyte = pdf_file.read()
             st.download_button(
-                label="📥 Download PDF",
+                label=f"📥 Download PDF ({page_count} page{'s' if page_count != 1 else ''})",
                 data=PDFbyte,
                 file_name="resume.pdf",
                 mime='application/pdf'
