@@ -92,8 +92,61 @@ def display_pdf(pdf_path):
     try:
         with open(pdf_path, "rb") as pdf_file:
             base64_pdf = base64.b64encode(pdf_file.read()).decode('utf-8')
-            pdf_display = f'<embed src="data:application/pdf;base64,{base64_pdf}" width="100%" height="800" type="application/pdf">'
-            st.markdown(pdf_display, unsafe_allow_html=True)
+
+            # Using PDF.js CDN to display the PDF
+            pdf_display = f"""
+                <html>
+                    <head>
+                        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+                        <script src="//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.8.335/pdf.min.js"></script>
+                        <style>
+                            #pdf-viewer {{
+                                width: 100%;
+                                height: 1200px;
+                                border: 1px solid #ccc;
+                                overflow: auto;
+                            }}
+                        </style>
+                    </head>
+                    <body>
+                        <div id="pdf-viewer"></div>
+                        <script>
+                            // The workerSrc property should be specified
+                            pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.8.335/pdf.worker.min.js';
+
+                            // Asynchronous download of PDF
+                            const loadingTask = pdfjsLib.getDocument({{
+                                data: atob('{base64_pdf}')
+                            }});
+                            
+                            loadingTask.promise.then(function(pdf) {{
+                                // Fetch the first page
+                                pdf.getPage(1).then(function(page) {{
+                                    const scale = 1.5;
+                                    const viewport = page.getViewport({{scale: scale}});
+
+                                    // Prepare canvas using PDF page dimensions
+                                    const canvas = document.createElement('canvas');
+                                    const context = canvas.getContext('2d');
+                                    canvas.height = viewport.height;
+                                    canvas.width = viewport.width;
+
+                                    // Render PDF page into canvas context
+                                    const renderContext = {{
+                                        canvasContext: context,
+                                        viewport: viewport
+                                    }};
+                                    
+                                    document.getElementById('pdf-viewer').appendChild(canvas);
+                                    page.render(renderContext);
+                                }});
+                            }});
+                        </script>
+                    </body>
+                </html>
+            """
+
+            st.components.v1.html(pdf_display, height=800)
 
         # Add download button for convenience
         with open(pdf_path, "rb") as pdf_file:
