@@ -90,65 +90,73 @@ def generate_final_pdf(yaml_content, resume_improver, output_dir):
 
 def display_pdf(pdf_path):
     try:
-        with open(pdf_path, "rb") as pdf_file:
-            base64_pdf = base64.b64encode(pdf_file.read()).decode('utf-8')
+        # Create the custom HTML with PDF.js viewer
+        custom_html = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>PDF Viewer</title>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+                <style>
+                    #pdf-container {
+                        width: 100%;
+                        height: 1200px;
+                        overflow: auto;
+                        background: #f8f9fa;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                    }
+                    #pdf-canvas {
+                        margin: 0 auto;
+                        display: block;
+                    }
+                </style>
+            </head>
+            <body>
+                <div id="pdf-container">
+                    <canvas id="pdf-canvas"></canvas>
+                </div>
+                <script>
+                    // Configure PDF.js worker
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+                    
+                    // Read the PDF file
+                    const pdfData = atob('PDFDATA');
+                    
+                    // Load and render the PDF
+                    pdfjsLib.getDocument({data: pdfData}).promise.then(function(pdf) {
+                        // Get first page
+                        return pdf.getPage(1);
+                    }).then(function(page) {
+                        const canvas = document.getElementById('pdf-canvas');
+                        const context = canvas.getContext('2d');
+                        const viewport = page.getViewport({scale: 1.5});
+                        
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+                        
+                        // Render PDF page into canvas context
+                        page.render({
+                            canvasContext: context,
+                            viewport: viewport
+                        });
+                    });
+                </script>
+            </body>
+            </html>
+        """
 
-            # Using PDF.js CDN to display the PDF
-            pdf_display = f"""
-                <html>
-                    <head>
-                        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-                        <script src="//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.8.335/pdf.min.js"></script>
-                        <style>
-                            #pdf-viewer {{
-                                width: 100%;
-                                height: 1200px;
-                                border: 1px solid #ccc;
-                                overflow: auto;
-                            }}
-                        </style>
-                    </head>
-                    <body>
-                        <div id="pdf-viewer"></div>
-                        <script>
-                            // The workerSrc property should be specified
-                            pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.8.335/pdf.worker.min.js';
+        # Read the PDF and convert to base64
+        with open(pdf_path, "rb") as file:
+            base64_pdf = base64.b64encode(file.read()).decode('utf-8')
 
-                            // Asynchronous download of PDF
-                            const loadingTask = pdfjsLib.getDocument({{
-                                data: atob('{base64_pdf}')
-                            }});
-                            
-                            loadingTask.promise.then(function(pdf) {{
-                                // Fetch the first page
-                                pdf.getPage(1).then(function(page) {{
-                                    const scale = 1.5;
-                                    const viewport = page.getViewport({{scale: scale}});
+        # Replace placeholder with actual PDF data
+        custom_html = custom_html.replace('PDFDATA', base64_pdf)
 
-                                    // Prepare canvas using PDF page dimensions
-                                    const canvas = document.createElement('canvas');
-                                    const context = canvas.getContext('2d');
-                                    canvas.height = viewport.height;
-                                    canvas.width = viewport.width;
+        # Display using Streamlit components
+        st.components.v1.html(custom_html, height=1250)
 
-                                    // Render PDF page into canvas context
-                                    const renderContext = {{
-                                        canvasContext: context,
-                                        viewport: viewport
-                                    }};
-                                    
-                                    document.getElementById('pdf-viewer').appendChild(canvas);
-                                    page.render(renderContext);
-                                }});
-                            }});
-                        </script>
-                    </body>
-                </html>
-            """
-
-            st.components.v1.html(pdf_display, height=800)
-
-        # Add download button for convenience
+        # Add download button
         with open(pdf_path, "rb") as pdf_file:
             PDFbyte = pdf_file.read()
             st.download_button(
@@ -157,6 +165,7 @@ def display_pdf(pdf_path):
                 file_name="resume.pdf",
                 mime='application/pdf'
             )
+
     except Exception as e:
         st.error(f"PDF display error: {str(e)}")
 
