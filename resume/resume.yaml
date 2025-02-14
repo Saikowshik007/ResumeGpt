@@ -34,11 +34,14 @@ experiences:
         startdate: January 2024
         enddate: Present
     highlights:
-      - Upgraded IBM Maas360 VPN (Mobile Device Management tool) from v2.5.6 to 2.6.10, enhancing security for enterprise clients (e.g., NASA, Pfizer) and optimizing tunnel speed by 20% via MTU packet-size optimization.
-      - Designed a distributed notification system using AWS IoT Core, Apache Kafka, and Spring Boot, reducing device verification latency from 500ms to 350ms (30% improvement).
-      - Reduced status update processing load by 50% by implementing shared subscription patterns in distributed systems.
-      - Led Open Shift Container Platform (OCP) development and QA environments, implementing automated testing frameworks and CI/CD pipelines that reduced system downtime by 40% across US and India teams.
-
+      - Led end-to-end development of mission-critical Digital Badge system projected to save $16M annually, architecting and implementing scalable backend services that transformed physical access management for 350K+ IBM employees
+      - Designed and implemented high-performance REST APIs and database schemas using PostgreSQL/MSSQL, achieving 99.99% uptime and <100ms latency through optimized query patterns and connection pooling
+      - Engineered secure authentication system using TLS 1.2 and WebSphere, enabling seamless integration with enterprise identity providers while maintaining SOC2 compliance
+      - Spearheaded cross-functional collaboration with external clients, gathering requirements and delivering technical presentations to C-level stakeholders
+      - Architected and deployed critical upgrade of IBM MaaS360 VPN infrastructure serving Fortune 500 clients (NASA, Pfizer), achieving 20% performance improvement through low-level network optimization while maintaining zero-downtime deployment
+      - Engineered distributed real-time notification system leveraging AWS IoT Core and Apache Kafka, reducing end-to-end latency by 30% (500ms to 350ms) while handling 1M+ daily events
+      - Optimized distributed system performance by implementing shared subscription patterns and load balancing, resulting in 50% reduction in message processing overhead and improved system resilience
+      - Led migration to OpenShift Container Platform across US and India teams, implementing automated testing and CI/CD pipelines that reduced deployment times by 60% and system downtime by 40%
   - company: Global Payments Inc
     skip_name: false
     location: Columbus, GA
