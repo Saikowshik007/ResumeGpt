@@ -2,7 +2,10 @@ import os
 import time
 import subprocess
 from datetime import datetime
+import streamlit as st
 from typing import List, Optional
+
+import streamlit
 from bs4 import BeautifulSoup
 import uuid
 import requests
@@ -196,6 +199,7 @@ class ResumeImprover:
         utils.write_yaml(
             self.parsed_job, filename=os.path.join(self.job_data_location, "job.yaml")
         )
+        st.session_state.resume_improver["job_description"] = self.parsed_job
 
     def create_draft_tailored_resume(
         self, auto_open=True, manual_review=True, skip_pdf_create=False
