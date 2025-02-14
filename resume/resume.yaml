@@ -113,12 +113,11 @@ skills:
       - Redis
       - MySQL
       - MongoDB
-      - SpringBoot
+      - Spring Boot
       - REST API
       - React.js
       - Airflow
       - Flutter
-      - Mockito
       - AWS
       - Lambda
       - Kafka
@@ -132,8 +131,6 @@ skills:
       - Mockito
       - Postman
       - SoapUI
-      - Jenkins
-      - Maven
       - Gradle
   - category: Non-technical
     skills:

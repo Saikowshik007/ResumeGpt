@@ -8,6 +8,7 @@ import yaml
 import tempfile
 import shutil
 from pathlib import Path
+from io import BytesIO
 
 def get_directory_structure(path):
     """Return a list of all subfolders in the given path"""
@@ -91,113 +92,64 @@ def generate_final_pdf(yaml_content, resume_improver, output_dir):
         return None
 
 def display_pdf(pdf_path):
-    """Display PDF using PDF.js with page count"""
+    """Display PDF using PDF.js with page count and provide ATS-friendly download"""
     try:
-        custom_html = """
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>PDF Viewer</title>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
-                <style>
-                    #pdf-container {
-                        width: 100%;
-                        height: 1200px;
-                        overflow: auto;
-                        background: #f8f9fa;
-                        border: 1px solid #ddd;
-                        border-radius: 4px;
-                    }
-                    .page-canvas {
-                        width: 100%;
-                        height: auto;
-                        display: block;
-                        margin-bottom: 20px;
-                    }
-                    #page-count {
-                        text-align: center;
-                        margin: 10px 0;
-                        font-size: 14px;
-                        color: #666;
-                    }
-                </style>
-            </head>
-            <body>
-                <div id="page-count"></div>
-                <div id="pdf-container"></div>
-                <script>
-                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
-                    
-                    const pdfData = atob('PDFDATA');
-                    
-                    async function renderPDF() {
-                        const container = document.getElementById('pdf-container');
-                        container.innerHTML = ''; // Clear existing content
-                        
-                        const pdf = await pdfjsLib.getDocument({data: pdfData}).promise;
-                        const pageCount = pdf.numPages;
-                        
-                        // Display page count
-                        document.getElementById('page-count').textContent = `Total Pages: ${pageCount}`;
-                        
-                        // Get container width
-                        const desiredWidth = container.clientWidth - 20;
-                        
-                        // Render each page
-                        for (let pageNum = 1; pageNum <= pageCount; pageNum++) {
-                            const page = await pdf.getPage(pageNum);
-                            const canvas = document.createElement('canvas');
-                            canvas.className = 'page-canvas';
-                            container.appendChild(canvas);
-                            
-                            const context = canvas.getContext('2d');
-                            
-                            // Calculate scale to fit width
-                            const viewport = page.getViewport({scale: 1.0});
-                            const scale = desiredWidth / viewport.width;
-                            const scaledViewport = page.getViewport({scale: scale});
-                            
-                            // Set canvas dimensions
-                            canvas.width = scaledViewport.width;
-                            canvas.height = scaledViewport.height;
-                            
-                            await page.render({
-                                canvasContext: context,
-                                viewport: scaledViewport
-                            }).promise;
-                        }
-                    }
-                    
-                    renderPDF();
-                    window.addEventListener('resize', renderPDF);
-                </script>
-            </body>
-            </html>
-        """
+        # First, verify the PDF exists and is readable
+        if not os.path.exists(pdf_path):
+            st.error("PDF file not found")
+            return
 
-        with open(pdf_path, "rb") as file:
-            base64_pdf = base64.b64encode(file.read()).decode('utf-8')
+        # Read the PDF file
+        with open(pdf_path, "rb") as pdf_file:
+            # Create base64 version for display
+            base64_pdf = base64.b64encode(pdf_file.read()).decode('utf-8')
 
-        custom_html = custom_html.replace('PDFDATA', base64_pdf)
-        st.components.v1.html(custom_html, height=1250)
+            # Store original PDF bytes for download
+            pdf_file.seek(0)
+            pdf_bytes = pdf_file.read()
 
-        # Add page count to Streamlit UI as well
+        # Use a simpler PDF.js viewer setup that's more reliable
+        pdf_display = f'''
+            <iframe
+                src="data:application/pdf;base64,{base64_pdf}"
+                width="100%"
+                height="800px"
+                type="application/pdf"
+            ></iframe>
+        '''
+
+        st.markdown(pdf_display, unsafe_allow_html=True)
+
+        # Add download functionality
         import PyPDF2
         with open(pdf_path, "rb") as pdf_file:
             pdf_reader = PyPDF2.PdfReader(pdf_file)
             page_count = len(pdf_reader.pages)
-            st.info(f"📄 PDF contains {page_count} page{'s' if page_count != 1 else ''}")
 
-            PDFbyte = pdf_file.read()
+            # Verify PDF is readable and contains text
+            text_content = ""
+            for page in pdf_reader.pages:
+                text_content += page.extract_text()
+
+            if text_content.strip():
+                st.success(f"✅ PDF is valid and contains {page_count} page{'s' if page_count != 1 else ''}")
+            else:
+                st.warning("⚠️ PDF appears to be empty or unreadable")
+
+        col1, col2 = st.columns([3, 1])
+        with col1:
             st.download_button(
-                label=f"📥 Download PDF ({page_count} page{'s' if page_count != 1 else ''})",
-                data=PDFbyte,
+                label=f"📥 Download ATS-Friendly PDF ({page_count} pages)",
+                data=pdf_bytes,
                 file_name="resume.pdf",
-                mime='application/pdf'
+                mime='application/pdf',
+                use_container_width=True
             )
 
     except Exception as e:
         st.error(f"PDF display error: {str(e)}")
+        import traceback
+        st.error(traceback.format_exc())
 
 class StreamlitHandler(logging.Handler):
     """Custom logging handler for Streamlit"""
