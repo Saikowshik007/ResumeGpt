@@ -1,8 +1,8 @@
 SECTION_HIGHLIGHTER:
-  system_message:  >
+  system_message: >
     You are an expert technical resume writer who specializes in creating impactful one-page resumes.
     Your goal is to strictly follow all the provided <Steps> and meet all the given <Criteria>.
-    You have to strictly stick to one page resume in which all the words combined should not exceed 600 words.
+    You have to strictly stick to one page resume in which all the words combined should not exceed 800 words.
   job_posting_template: |
     <Job Posting>
     The ideal candidate is able to perform the following duties:{duties}
@@ -13,15 +13,19 @@ SECTION_HIGHLIGHTER:
   resume_template: |
     <Resume>{section}
   instruction_message: |
-    <Instruction> Identify the relevant portions from the <Resume> that match the <Job Posting>, rephrase these relevant portions into highlights, and rate the relevance of each highlight to the <Job Posting> on a scale of 1-4.
+    <Instruction> Identify the relevant portions from the <Resume> that match the <Job Posting> and transform them into powerful, achievement-focused bullet points.
   criteria_message: |
     <Criteria> 
-    - Each highlight must be based on what is mentioned in the <Resume>. 
-    - In each highlight, include how that experience in the <Resume> demonstrates an ability to perform duties mentioned in the <Job Posting>.
-    - In each highlight, try to include action verbs, give tangible and concrete examples, and include success metrics when available.
-    - Grammar, spellings, and sentence structure must be correct.
+    - Each bullet point must be based strictly on what is mentioned in the <Resume>.
+    - Structure each bullet point in this exact format: [Strong action verb] + [Specific task accomplished] + [Tools/technologies used] + [Quantifiable impact/result].
+    - Begin each bullet with a powerful action verb in past tense (e.g., Developed, Engineered, Spearheaded, Optimized).
+    - Include specific tools, technologies, and methodologies used.
+    - Always quantify results with metrics, percentages, dollar values, or time saved.
+    - Keep each bullet point to a maximum of 2 lines.
+    - Never include reasoning phrases like "showcasing," "demonstrating," or "highlighting" that explain why the experience is relevant.
+    - Never include justifications that connect the experience to the job description.
+    - Grammar, spelling, and sentence structure must be flawless.
     - Include a "Length Optimization" section with specific suggestions to achieve one page.
-
   steps_message: |
     <Steps>
     - Create a <Plan> for following the <Instruction> while meeting all the <Criteria>.
@@ -39,7 +43,7 @@ SKILLS_MATCHER:
     The ideal candidate has the following skills:{technical_skills}
     {non_technical_skills}
     Keywords that may be triggered by Applicant Tracking Systems (ATS) that should be added (if applicable): {ats_keywords}
-  resume_template:  |
+  resume_template: |
     <Resume>
     Experience:
     {experiences}
@@ -47,12 +51,14 @@ SKILLS_MATCHER:
     <Instruction> Extract technical and non-technical skills from the <Resume> that match the skills required in the <Job Posting>.
   criteria_message: |
     <Criteria> 
-    - Each skill must be based on what is mentioned in the <Resume>.
-    - Technical skills are programming languages, technologies, and tools. Examples: Python, Excel, SQL, Snowflake, Data Science, Machine learning, etc.
-    - Non-technical skills are soft skills. Communication, Leadership, Adaptability, Teamwork, Problem solving, Critical thinking, Time management.
-    - Each skill must be written in sentence case.
+    - Each skill must be based on what is explicitly mentioned in the <Resume>.
+    - Technical skills are programming languages, technologies, frameworks, methodologies, tools, and platforms. Examples: Python, AWS, Spring Boot, Kubernetes, CI/CD, etc.
+    - Non-technical skills are soft skills and competencies. Examples: Leadership, Cross-functional collaboration, Project management, Problem-solving, etc.
+    - Each skill must be written in sentence case with proper technical capitalization (e.g., JavaScript not Javascript).
+    - Group similar skills together (e.g., "Java, Python, SQL" under Programming Languages).
     - No skills should be included more than once.
-  steps_message:  |
+    - For each skill, note the specific part of the resume where it appears.
+  steps_message: |
     <Steps>
     - Create a <Plan> for following the <Instruction> while meeting all the <Criteria>.
     - What <Additional Steps> are needed to follow the <Plan>?
@@ -60,40 +66,10 @@ SKILLS_MATCHER:
     - Verify that skills are reflective of the <Resume> and not the <Job Posting>. Update if necessary.
     - Verify that all <Criteria> are met, and update if necessary.
     - Provide the answer to the <Instruction> with prefix <Final Answer>.
-#OBJECTIVE_WRITER:
-#  system_message: >
-#    You are a talented analytics professional and Product Manager with an expertise in building user friendly and advanced tech products. You are renowned for your ability to explain complex subjects in simple yet effective terms. You have been tasked with re-writing resume sections for a great product manager. You have been tasked with re-writing a resume objective statement for a product manager. Your goal is to strictly follow all the provided <Steps> and meet all the given <Criteria>.
-#  job_posting_template: |
-#    <Job Posting>
-#    {company}
-#    {job_summary}
-#    Keywords that may be triggered by Applicant Tracking Systems (ATS) that should be added (if applicable): {ats_keywords}
-#  resume_template: |
-#    <Resume>
-#    Experience:
-#    {experiences}
-#    Skills:{skills}
-#  instruction_message:  |
-#    <Instruction> Create a Compelling objective statement from the provided <Resume>.
-#  criteria_message: |
-#    <Criteria>
-#    - Objective Statement must showcase that I will be ideal for the <Job Posting>.
-#    - Objective Statement is no longer than 3-4 sentences. Keep it succinct and to the point.
-#    - Objective Statement should follow this template: A [Professional Title] with over 10 years of experience in [Field]. Demonstrated success in [Key accomplishments] resulting in [specific metrics]. Skilled in [Skills]. Commited to driving [career goals] in the [target industry].
-#    - Ensure the resume will pass ATS screening (include any relevant keywords from the <Job Posting> that also describe my experience from the <Resume>).
-#    - Grammar, spellings, and sentence structure must be correct.
-#  steps_message: |
-#    <Steps>
-#    - Create a <Plan> for following the <Instruction> while meeting all the <Criteria>.
-#    - What <Additional Steps> are needed to follow the <Plan>?
-#    - Follow all steps one by one and show your <Work>.
-#    - Verify that objective is reflective of my <Resume> and not the <Job Posting>. Update if necessary.
-#    - Verify that all <Criteria> are met, and update if necessary.
-#    - Provide the answer to the <Instruction> with prefix <Final Answer>.
 
 IMPROVER:
   system_message: >
-    You are an expert critic. Your goal is to strictly follow all the provided <Steps> and meet all the given <Criteria>.
+    You are an expert resume critic with specialized knowledge in technical resumes and ATS optimization. Your goal is to strictly follow all the provided <Steps> and meet all the given <Criteria>.
   job_posting_template: |
     <Job Posting>
     The ideal candidate is able to perform the following duties:{duties}
@@ -105,17 +81,22 @@ IMPROVER:
     {experiences}
     {education}
     {skills}
-  instruction_message:  |
-    <Instruction> Critique my <Resume>, and suggest how I can improve it so it showcases that I am the ideal candidate who meets all the requirements of the <Job Posting>. Your goal is to ensure the resume passes ATS screening for the specific job posting.
+  instruction_message: |
+    <Instruction> Critique my <Resume> and provide specific improvements to make it more impactful, achievement-oriented, and ATS-optimized for the <Job Posting>.
   criteria_message: |
     <Criteria>
-    - Find any spelling or grammar errors in my <Resume>, and include suggestions to fix them.
-    - Find any keywords that may be triggered by ATS screening that are missing from the resume and include suggestions to add them.
-    - Find any resume items that appear like lazy 'copy and paste' items from the job posting and include suggestions to fix them.
-    - Find any duplicate skills or resume experiences and include suggestions to de-duplicate them.
-    - Compile all your suggestions from <Work> into the <Final Answer>.
-    - For each suggestion in the <Final Answer>, include the respective <Resume> section, what needs to be improved, and how to improve it.
-    - In the <Final Answer>, include a section for Spelling and Grammar, including any suggestions for improvements.
+    - Identify any spelling, grammar, or formatting errors in my <Resume>, and include specific corrections.
+    - Suggest how to incorporate missing ATS keywords from the job posting naturally into the resume.
+    - Flag any generic statements or vague claims and suggest specific, quantifiable replacements.
+    - Identify any duplicate or redundant skills or experiences and suggest precise consolidation.
+    - For each bullet point, recommend how to transform it into the format: [Strong action verb] + [Specific task] + [Tools/technologies] + [Quantifiable impact].
+    - Identify and suggest removal of all phrases that explain why an experience is relevant to the job (e.g., "demonstrating," "showcasing," "highlighting").
+    - Point out any bullet points that exceed two lines and suggest concise alternatives.
+    - Recommend industry-standard formatting improvements for enhanced readability.
+    - Compile all suggestions into the <Final Answer>, organized by resume section.
+    - For each suggested improvement in the <Final Answer>, include: the original text, what needs to be improved, and the specific recommended change.
+    - Include a dedicated section for Spelling and Grammar improvements.
+
   steps_message: |
     <Steps>
     - Create a <Plan> for following the <Instruction> while meeting all the <Criteria>.
