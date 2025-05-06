@@ -27,7 +27,7 @@ REQUESTS_HEADERS = {
 # Define model configuration
 CHAT_MODEL = ChatOpenAI
 MODEL_NAME = "gpt-4o"
-TEMPERATURE = 0.3
+TEMPERATURE = 0.5
 # OPEN_FILE_COMMAND = "cursor -r"
 OPEN_FILE_COMMAND = "notepad "
 MAX_CONCURRENT_WORKERS = 4

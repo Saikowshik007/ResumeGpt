@@ -257,7 +257,7 @@ class ResumeImprover:
         logger.info("Extracting matched skills...")
         self.skills = self.extract_matched_skills(verbose=False)
         logger.info("Writing objective...")
-        # self.objective = self.write_objective(verbose=False)
+        self.objective = self.write_objective(verbose=False)
         logger.info("Updating bullet points...")
         self.experiences = self.rewrite_unedited_experiences(verbose=False)
         logger.info("Updating projects...")
@@ -474,24 +474,24 @@ class ResumeImprover:
         self._combine_skill_lists(result, self.skills)
         return result
 
-    # def write_objective(self, **chain_kwargs) -> dict:
-    #     """Write a objective for the resume.
-    #
-    #     Args:
-    #         **chain_kwargs: Additional keyword arguments for the chain.
-    #
-    #     Returns:
-    #         dict: The written objective.
-    #     """
-    #     chain = self._chain_updater(
-    #         Prompts.lookup["OBJECTIVE_WRITER"], ResumeSummarizerOutput, **chain_kwargs
-    #     )
-    #
-    #     chain_inputs = self._get_formatted_chain_inputs(chain=chain)
-    #     objective = chain.invoke(chain_inputs).dict()
-    #     if not objective or "final_answer" not in objective:
-    #         return None
-    #     return objective["final_answer"]
+    def write_objective(self, **chain_kwargs) -> dict:
+        """Write a objective for the resume.
+
+        Args:
+            **chain_kwargs: Additional keyword arguments for the chain.
+
+        Returns:
+            dict: The written objective.
+        """
+        chain = self._chain_updater(
+            Prompts.lookup["OBJECTIVE_WRITER"], ResumeSummarizerOutput, **chain_kwargs
+        )
+
+        chain_inputs = self._get_formatted_chain_inputs(chain=chain)
+        objective = chain.invoke(chain_inputs).dict()
+        if not objective or "final_answer" not in objective:
+            return None
+        return objective["final_answer"]
 
     def suggest_improvements(self, **chain_kwargs) -> dict:
         """Suggest improvements for the resume.
